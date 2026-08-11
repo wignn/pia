@@ -4,9 +4,9 @@ import { motion } from "framer-motion";
 
 export function Portal() {
   return (
-    <section className="relative min-h-screen  overflow-hidden text-white flex flex-col justify-between" id="portal">
+    <section className="relative isolate min-h-screen overflow-hidden text-white flex flex-col justify-between" id="portal">
 
-      <div className="absolute inset-0 bg-gradient-to-b from-blue-700 via-blue-900 to-black opacity-40 pointer-events-none" />
+      <div className="absolute inset-0 z-0 bg-gradient-to-b from-blue-700 via-blue-900 to-black opacity-40 pointer-events-none" />
 
       <h1 className="
         absolute
@@ -41,11 +41,12 @@ export function Portal() {
       {/* top */}
       <div className="
         relative
-        z-10
+        z-50
         flex
         flex-col
         items-center
         pt-8
+        pointer-events-auto
       ">
 
         <p className="
@@ -83,12 +84,16 @@ export function Portal() {
 
 
         <a
-          href="https://discord.com/oauth2/authorize?client_id=1410191834241601556&permissions=8&integration_type=0&scope=bot"
+          href="https://discord.com/oauth2/authorize?client_id=1534422019561492510&permissions=8&integration_type=0&scope=bot"
           target="_blank"
           rel="noreferrer"
           style={{ backgroundColor: "#ffffff", color: "#0000ff" }}
           className="
+            relative
+            z-50
             mt-8
+            cursor-pointer
+            pointer-events-auto
             px-8
             py-3.5
             font-mono
@@ -102,40 +107,36 @@ export function Portal() {
             inline-block
             border
             border-blue-600
-            z-30
           "
         >
           ADD BOT TO DISCORD SERVER
         </a>
-
       </div>
 
-      <div className="relative w-full h-[70vh] max-h-[850px] flex items-center justify-center my-4">
-  <motion.img
-    src="/logo.png"
-    alt="character"
-    initial={{
-      opacity: 0,
-      y: 50
-    }}
-    animate={{
-      opacity: 1,
-      y: 0
-    }}
-    transition={{
-      duration: 1
-    }}
-    className="
-      h-full
-      max-h-[800px]
-      w-auto
-      object-contain
-      z-20
-      mix-blend-screen
-      scale-110
-      md:scale-125
-    "
-  />
+      <div className="relative z-10 w-full h-[70vh] max-h-[850px] flex items-center justify-center my-4 pointer-events-none">
+        <motion.video
+          src="/char.webm"
+          autoPlay
+          loop
+          muted
+          playsInline
+          aria-label="SLV character animation"
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1 }}
+          className="
+            h-full
+            max-h-[800px]
+            w-auto
+            object-contain
+            relative
+            z-0
+            pointer-events-none
+            mix-blend-screen
+            scale-110
+            md:scale-125
+          "
+        />
       </div>
 
       {/* footer bar */}
