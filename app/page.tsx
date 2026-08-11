@@ -5,18 +5,19 @@ import { TechStackSection } from "@/src/components/TechStackSection";
 import { Hero } from "@/src/components/Hero";
 import { Navbar } from "@/src/components/Navbar";
 import { ScrollCanvas } from "@/src/components/ScrollCanvas";
-import Portal from "@/src/components/Motion";
+import { SectionTransition } from "@/src/components/SectionTransition";
+import {Portal} from "@/src/components/Motion";
 
 export default function Home() {
   return (
-    <main className="relative">
+    <main className="relative page-sections">
       <ScrollCanvas />
       <Navbar />
-      <Hero />
-      <FeatureSection />
-      <ArchitectureSection />
-      <TechStackSection />
-      <Portal />
+      <SectionTransition><Hero /></SectionTransition>
+      <SectionTransition><FeatureSection /></SectionTransition>
+      <SectionTransition><ArchitectureSection /></SectionTransition>
+      <SectionTransition><TechStackSection /></SectionTransition>
+      <SectionTransition><Portal /></SectionTransition>
     </main>
   );
 }

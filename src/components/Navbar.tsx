@@ -47,7 +47,7 @@ export function Navbar() {
             )}
           </AnimatePresence>
         </div>
-        <a className="nav-install" href="https://discord.com/oauth2/authorize?client_id=1410191834241601556&permissions=8&integration_type=0&scope=bot" target="_blank" rel="noreferrer">ADD BOT <span aria-hidden="true">→</span></a>
+        <a className="nav-install" href="https://discord.com/oauth2/authorize?client_id=1534422019561492510&permissions=8&integration_type=0&scope=bot" target="_blank" rel="noreferrer">ADD BOT <span aria-hidden="true">→</span></a>
       </div>
       <button className="nav-menu" onClick={() => setOpen((value) => !value)} aria-label="Toggle navigation" aria-expanded={open}><span /><span /></button>
     </header>

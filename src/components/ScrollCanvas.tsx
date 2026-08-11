@@ -10,107 +10,92 @@ export function ScrollCanvas() {
     const container = containerRef.current;
     if (!container) return;
 
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(55, width / height, 0.1, 1000);
-    camera.position.z = 18;
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.z = 20;
 
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+    renderer.setSize(window.innerWidth, window.innerHeight);
     container.appendChild(renderer.domElement);
 
-    // Continuous 3D particle stream across all sections
-    const count = 750;
-    const geometry = new THREE.BufferGeometry();
-    const positions = new Float32Array(count * 3);
-    const colors = new Float32Array(count * 3);
-
-    const color1 = new THREE.Color(0x3838ff);
-    const color2 = new THREE.Color(0x00ff88);
-
-    for (let i = 0; i < count; i++) {
-      const idx = i * 3;
-      positions[idx] = (Math.random() - 0.5) * 50;
-      positions[idx + 1] = (Math.random() - 0.5) * 160;
-      positions[idx + 2] = (Math.random() - 0.5) * 30;
-
-      const mix = Math.random();
-      const c = color1.clone().lerp(color2, mix > 0.88 ? 0.7 : 0);
-      colors[idx] = c.r;
-      colors[idx + 1] = c.g;
-      colors[idx + 2] = c.b;
+    // A restrained particle field keeps the page alive without competing with content.
+    const particleCount = 420;
+    const particleGeometry = new THREE.BufferGeometry();
+    const particlePositions = new Float32Array(particleCount * 3);
+    for (let i = 0; i < particleCount; i++) {
+      const index = i * 3;
+      particlePositions[index] = (Math.random() - 0.5) * 42;
+      particlePositions[index + 1] = (Math.random() - 0.5) * 100;
+      particlePositions[index + 2] = (Math.random() - 0.5) * 18 - 3;
     }
-
-    geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-    geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
-
-    const particleMat = new THREE.PointsMaterial({
-      size: 0.15,
-      vertexColors: true,
+    particleGeometry.setAttribute("position", new THREE.BufferAttribute(particlePositions, 3));
+    const particleMaterial = new THREE.PointsMaterial({
+      color: 0x7070ff,
+      size: 0.08,
       transparent: true,
-      opacity: 0.5,
+      opacity: 0.3,
+      depthWrite: false,
       blending: THREE.AdditiveBlending,
     });
-
-    const particles = new THREE.Points(geometry, particleMat);
+    const particles = new THREE.Points(particleGeometry, particleMaterial);
     scene.add(particles);
 
-    // Dynamic Concentric Rings Group (Lingkaran konsentris)
-    const ringGroup = new THREE.Group();
-    const ring1 = new THREE.Mesh(
-      new THREE.TorusGeometry(10, 0.02, 16, 100),
-      new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: 0.25 })
-    );
-    const ring2 = new THREE.Mesh(
-      new THREE.TorusGeometry(14, 0.015, 16, 100),
-      new THREE.MeshBasicMaterial({ color: 0x00ff88, wireframe: true, transparent: true, opacity: 0.2 })
-    );
-    const ring3 = new THREE.Mesh(
-      new THREE.TorusGeometry(18, 0.012, 16, 100),
-      new THREE.MeshBasicMaterial({ color: 0x4f4fff, wireframe: true, transparent: true, opacity: 0.15 })
-    );
-    ring1.rotation.x = Math.PI / 3;
-    ring2.rotation.y = Math.PI / 4;
-    ring3.rotation.z = Math.PI / 6;
+    // Three quiet orbital rings: one focal element, no large pipe geometry.
+    const orbit = new THREE.Group();
+    const ringMeshes: THREE.Mesh[] = [];
+    const rings = [
+      { radius: 5.5, color: 0xffffff, opacity: 0.22, tilt: 0.34 },
+      { radius: 7.8, color: 0x6969ff, opacity: 0.16, tilt: -0.48 },
+      { radius: 10.5, color: 0x00d9ff, opacity: 0.1, tilt: 0.18 },
+    ];
 
-    ringGroup.add(ring1);
-    ringGroup.add(ring2);
-    ringGroup.add(ring3);
-    scene.add(ringGroup);
+    for (const ring of rings) {
+      const geometry = new THREE.TorusGeometry(ring.radius, 0.018, 12, 96);
+      const material = new THREE.MeshBasicMaterial({
+        color: ring.color,
+        transparent: true,
+        opacity: ring.opacity,
+        depthWrite: false,
+      });
+      const mesh = new THREE.Mesh(geometry, material);
+      mesh.rotation.x = ring.tilt;
+      ringMeshes.push(mesh);
+      orbit.add(mesh);
+    }
+    orbit.position.set(4, 0, -5);
+    scene.add(orbit);
 
-    let scrollY = window.scrollY;
-    let targetScrollY = scrollY;
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let scrollProgress = window.scrollY / Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
+    let targetScrollProgress = scrollProgress;
+    let animationId = 0;
+    const clock = new THREE.Clock();
 
     const onScroll = () => {
-      targetScrollY = window.scrollY;
+      targetScrollProgress = window.scrollY / Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
     };
-    window.addEventListener("scroll", onScroll, { passive: true });
+    const onResize = () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    };
 
-    let animationId: number;
-    let clock = new THREE.Clock();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onResize);
 
     const animate = () => {
-      const elapsedTime = clock.getElapsedTime();
+      const elapsed = clock.getElapsedTime();
+      scrollProgress += (targetScrollProgress - scrollProgress) * 0.045;
 
-      // Smooth scroll inertia tracking
-      scrollY += (targetScrollY - scrollY) * 0.05;
-      const totalHeight = document.documentElement.scrollHeight - window.innerHeight || 1;
-      const scrollProgress = scrollY / totalHeight;
-
-      // Seamless camera tracking along whole page scroll
-      camera.position.y = -scrollProgress * 45;
-      camera.position.z = 18 + Math.sin(scrollProgress * Math.PI * 3) * 4;
-      camera.rotation.z = Math.sin(scrollProgress * Math.PI * 2) * 0.1;
-
-      // Object animation continuum
-      particles.rotation.y = scrollProgress * Math.PI * 4 + elapsedTime * 0.02;
-
-      ringGroup.rotation.z = scrollProgress * Math.PI * 4 + elapsedTime * 0.05;
-      ringGroup.rotation.x = scrollProgress * Math.PI * 2 + elapsedTime * 0.02;
-      ringGroup.position.y = -scrollProgress * 45;
+      if (!prefersReducedMotion) {
+        orbit.position.y = 2.5 - scrollProgress * 5;
+        orbit.position.x = 4 + Math.sin(scrollProgress * Math.PI * 2) * 1.2;
+        orbit.rotation.z = elapsed * 0.018 + scrollProgress * Math.PI * 0.4;
+        orbit.rotation.y = Math.sin(elapsed * 0.12) * 0.08;
+        particles.rotation.y = elapsed * 0.008;
+        particles.position.y = -scrollProgress * 4;
+      }
 
       renderer.render(scene, camera);
       animationId = requestAnimationFrame(animate);
@@ -118,30 +103,18 @@ export function ScrollCanvas() {
 
     animate();
 
-    const onResize = () => {
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
-      renderer.setSize(w, h);
-    };
-    window.addEventListener("resize", onResize);
-
     return () => {
       cancelAnimationFrame(animationId);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
-      if (container.contains(renderer.domElement)) {
-        container.removeChild(renderer.domElement);
-      }
-      geometry.dispose();
-      particleMat.dispose();
-      ring1.geometry.dispose();
-      (ring1.material as THREE.Material).dispose();
-      ring2.geometry.dispose();
-      (ring2.material as THREE.Material).dispose();
-      ring3.geometry.dispose();
-      (ring3.material as THREE.Material).dispose();
+      if (container.contains(renderer.domElement)) container.removeChild(renderer.domElement);
+
+      particleGeometry.dispose();
+      particleMaterial.dispose();
+      ringMeshes.forEach((mesh) => {
+        mesh.geometry.dispose();
+        (mesh.material as THREE.Material).dispose();
+      });
       renderer.dispose();
     };
   }, []);

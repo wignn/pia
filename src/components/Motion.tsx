@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 
-export default function Portal() {
+export function Portal() {
   return (
     <section className="relative min-h-screen  overflow-hidden text-white flex flex-col justify-between" id="portal">
 
