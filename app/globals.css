@@ -11,8 +11,7 @@
 
 * { box-sizing: border-box; }
 html {
-  scroll-behavior: smooth;
-  scroll-snap-type: y proximity;
+  scroll-behavior: auto;
   background: var(--blue);
 }
 body {
@@ -32,7 +31,6 @@ body {
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
-    scroll-snap-type: none;
   }
 
   .page-sections > .section-transition {
@@ -43,6 +41,19 @@ body {
 /* Keep the transition boundary transparent to the section layout. */
 .section-transition {
   position: relative;
+  will-change: opacity, transform, filter;
+}
+
+.three-canvas canvas {
+  display: block;
+  transform: translateZ(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section-transition {
+    will-change: auto;
+    filter: none !important;
+  }
 }
 
 /* Reduce motion on devices that explicitly request it. */

@@ -14,10 +14,10 @@ export function SectionTransition({ children, className }: SectionTransitionProp
   return (
     <motion.div
       className={`section-transition${className ? ` ${className}` : ""}`}
-      initial={reducedMotion ? false : { opacity: 0, y: 18 }}
-      whileInView={reducedMotion ? undefined : { opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2, margin: "0px 0px -10%" }}
-      transition={{ duration: 1.05, ease: [0.16, 1, 0.3, 1] }}
+      initial={reducedMotion ? false : { opacity: 0, y: 16, filter: "blur(4px)" }}
+      whileInView={reducedMotion ? undefined : { opacity: 1, y: 0, filter: "blur(0px)" }}
+      viewport={{ once: true, amount: 0.18, margin: "0px 0px -12%" }}
+      transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
     >
       {children}
     </motion.div>

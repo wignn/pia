@@ -6,32 +6,43 @@ export function SmoothScroll() {
   useEffect(() => {
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const isDesktop = () => window.innerWidth > 768;
+    const previousScrollBehavior = document.documentElement.style.scrollBehavior;
+    document.documentElement.style.scrollBehavior = "auto";
+
     let target = window.scrollY;
     let frame = 0;
     let smoothing = false;
 
-    const limit = (value: number) => Math.max(0, Math.min(value, document.documentElement.scrollHeight - window.innerHeight));
+    const limit = (value: number) =>
+      Math.max(0, Math.min(value, document.documentElement.scrollHeight - window.innerHeight));
 
     const animate = () => {
       const current = window.scrollY;
-      const next = current + (target - current) * 0.24;
+      const distance = target - current;
 
-      if (Math.abs(target - next) < 0.5) {
-        window.scrollTo(0, target);
+      if (Math.abs(distance) < 1) {
+        window.scrollTo({ top: target, behavior: "auto" });
         smoothing = false;
         frame = 0;
         return;
       }
 
-      window.scrollTo(0, next);
+      window.scrollTo({ top: current + distance * 0.42, behavior: "auto" });
       frame = requestAnimationFrame(animate);
     };
 
     const onWheel = (event: WheelEvent) => {
-      if (reduceMotion.matches || !isDesktop() || event.ctrlKey || Math.abs(event.deltaX) > Math.abs(event.deltaY)) return;
+      if (
+        reduceMotion.matches ||
+        !isDesktop() ||
+        event.ctrlKey ||
+        Math.abs(event.deltaX) > Math.abs(event.deltaY)
+      ) {
+        return;
+      }
 
       event.preventDefault();
-      const multiplier = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? window.innerHeight : 1.25;
+      const multiplier = event.deltaMode === 1 ? 18 : event.deltaMode === 2 ? window.innerHeight : 1.55;
       target = limit(target + event.deltaY * multiplier);
       smoothing = true;
 
@@ -46,6 +57,7 @@ export function SmoothScroll() {
     window.addEventListener("scroll", onScroll, { passive: true });
 
     return () => {
+      document.documentElement.style.scrollBehavior = previousScrollBehavior;
       window.removeEventListener("wheel", onWheel);
       window.removeEventListener("scroll", onScroll);
       if (frame) cancelAnimationFrame(frame);

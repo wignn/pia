@@ -12,14 +12,15 @@ export function ScrollCanvas() {
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
-    camera.position.z = 20;
+    const cameraTarget = new THREE.Vector3(0, 0, 20);
+    camera.position.copy(cameraTarget);
 
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: "high-performance" });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.domElement.style.willChange = "transform";
     container.appendChild(renderer.domElement);
 
-    // A restrained particle field keeps the page alive without competing with content.
     const particleCount = 420;
     const particleGeometry = new THREE.BufferGeometry();
     const particlePositions = new Float32Array(particleCount * 3);
@@ -41,7 +42,6 @@ export function ScrollCanvas() {
     const particles = new THREE.Points(particleGeometry, particleMaterial);
     scene.add(particles);
 
-    // Three quiet orbital rings: one focal element, no large pipe geometry.
     const orbit = new THREE.Group();
     const ringMeshes: THREE.Mesh[] = [];
     const rings = [
@@ -66,11 +66,50 @@ export function ScrollCanvas() {
     orbit.position.set(4, 0, -5);
     scene.add(orbit);
 
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // Minimal celestial symbol: a quiet moon/sun disk with orbital halos.
+    const celestial = new THREE.Group();
+    const celestialGeometry = new THREE.CircleGeometry(3.2, 64);
+    const celestialMaterial = new THREE.MeshBasicMaterial({
+      color: 0x8fa4ff,
+      transparent: true,
+      opacity: 0.13,
+      depthWrite: false,
+    });
+    const celestialDisk = new THREE.Mesh(celestialGeometry, celestialMaterial);
+    celestial.add(celestialDisk);
+
+    const celestialRingGeometry = new THREE.TorusGeometry(3.7, 0.025, 12, 96);
+    const celestialRingMaterial = new THREE.MeshBasicMaterial({
+      color: 0xb8c2ff,
+      transparent: true,
+      opacity: 0.3,
+      depthWrite: false,
+    });
+    const celestialRing = new THREE.Mesh(celestialRingGeometry, celestialRingMaterial);
+    celestial.add(celestialRing);
+
+    const celestialHaloGeometry = new THREE.TorusGeometry(5.4, 0.012, 12, 96);
+    const celestialHaloMaterial = new THREE.MeshBasicMaterial({
+      color: 0x5268ff,
+      transparent: true,
+      opacity: 0.16,
+      depthWrite: false,
+    });
+    const celestialHalo = new THREE.Mesh(celestialHaloGeometry, celestialHaloMaterial);
+    celestialHalo.rotation.x = Math.PI / 3;
+    celestial.add(celestialHalo);
+    celestial.position.set(-5, 2, -8);
+    scene.add(celestial);
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const damp = (current: number, target: number, speed: number, delta: number) =>
+      THREE.MathUtils.lerp(current, target, 1 - Math.exp(-speed * delta));
+
     let scrollProgress = window.scrollY / Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
     let targetScrollProgress = scrollProgress;
     let animationId = 0;
-    const clock = new THREE.Clock();
+    let lastTime = performance.now();
+    let running = true;
 
     const onScroll = () => {
       targetScrollProgress = window.scrollY / Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
@@ -80,37 +119,77 @@ export function ScrollCanvas() {
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
     };
+    const render = (now: number) => {
+      if (!running) return;
+      const delta = Math.min((now - lastTime) / 1000, 0.05);
+      lastTime = now;
+      const elapsed = now / 1000;
+
+      scrollProgress = damp(scrollProgress, targetScrollProgress, 3.8, delta);
+      const motion = reduceMotion.matches ? 0 : 1;
+      const float = Math.sin(elapsed * 0.32) * 0.18 * motion;
+      const scrollY = -scrollProgress * 5;
+      const celestialY = 2 - scrollProgress * 10;
+
+      orbit.position.y = damp(orbit.position.y, 2.5 + scrollY + float, 5.5, delta);
+      orbit.position.x = damp(orbit.position.x, 4 + Math.sin(scrollProgress * Math.PI * 2) * 1.2, 2.6, delta);
+      orbit.position.z = damp(orbit.position.z, -5 - scrollProgress * 1.5, 2.4, delta);
+      orbit.rotation.z = damp(orbit.rotation.z, elapsed * 0.018 + scrollProgress * Math.PI * 0.4, 2.2, delta);
+      orbit.rotation.y = damp(orbit.rotation.y, Math.sin(elapsed * 0.12) * 0.08, 2.2, delta);
+      const breathing = 1 + Math.sin(elapsed * 0.42) * 0.012 * motion;
+      orbit.scale.setScalar(damp(orbit.scale.x, breathing, 2.4, delta));
+
+      celestial.position.y = damp(celestial.position.y, celestialY + float * 0.35, 2.6, delta);
+      celestial.position.x = damp(celestial.position.x, -5 + Math.sin(scrollProgress * Math.PI) * 2, 2.2, delta);
+      celestial.rotation.z = elapsed * 0.012 + scrollProgress * Math.PI * 0.18;
+      celestialRing.rotation.z = elapsed * 0.02;
+      celestialHalo.rotation.z = -elapsed * 0.012;
+      const celestialScale = 1 + Math.sin(elapsed * 0.28) * 0.015 * motion;
+      celestial.scale.setScalar(damp(celestial.scale.x, celestialScale, 2.2, delta));
+
+      particles.rotation.y = elapsed * 0.008;
+      particles.position.y = damp(particles.position.y, scrollProgress * -4, 2.5, delta);
+
+      cameraTarget.y = damp(cameraTarget.y, Math.sin(scrollProgress * Math.PI) * -0.45, 2.2, delta);
+      cameraTarget.x = damp(cameraTarget.x, Math.sin(scrollProgress * Math.PI * 2) * 0.12, 2.2, delta);
+      cameraTarget.z = damp(cameraTarget.z, 20 - scrollProgress * 0.8, 2.2, delta);
+      camera.position.lerp(cameraTarget, 1 - Math.exp(-3.2 * delta));
+      camera.lookAt(0, camera.position.y * 0.12, -2);
+
+      renderer.render(scene, camera);
+      animationId = requestAnimationFrame(render);
+    };
+
+    const onVisibility = () => {
+      running = document.visibilityState === "visible";
+      if (running) {
+        lastTime = performance.now();
+        animationId = requestAnimationFrame(render);
+      } else {
+        cancelAnimationFrame(animationId);
+      }
+    };
 
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize);
-
-    const animate = () => {
-      const elapsed = clock.getElapsedTime();
-      scrollProgress += (targetScrollProgress - scrollProgress) * 0.045;
-
-      if (!prefersReducedMotion) {
-        orbit.position.y = 2.5 - scrollProgress * 5;
-        orbit.position.x = 4 + Math.sin(scrollProgress * Math.PI * 2) * 1.2;
-        orbit.rotation.z = elapsed * 0.018 + scrollProgress * Math.PI * 0.4;
-        orbit.rotation.y = Math.sin(elapsed * 0.12) * 0.08;
-        particles.rotation.y = elapsed * 0.008;
-        particles.position.y = -scrollProgress * 4;
-      }
-
-      renderer.render(scene, camera);
-      animationId = requestAnimationFrame(animate);
-    };
-
-    animate();
+    document.addEventListener("visibilitychange", onVisibility);
+    animationId = requestAnimationFrame(render);
 
     return () => {
       cancelAnimationFrame(animationId);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
+      document.removeEventListener("visibilitychange", onVisibility);
       if (container.contains(renderer.domElement)) container.removeChild(renderer.domElement);
 
       particleGeometry.dispose();
       particleMaterial.dispose();
+      celestialGeometry.dispose();
+      celestialMaterial.dispose();
+      celestialRingGeometry.dispose();
+      celestialRingMaterial.dispose();
+      celestialHaloGeometry.dispose();
+      celestialHaloMaterial.dispose();
       ringMeshes.forEach((mesh) => {
         mesh.geometry.dispose();
         (mesh.material as THREE.Material).dispose();
@@ -119,5 +198,5 @@ export function ScrollCanvas() {
     };
   }, []);
 
-  return <div ref={containerRef} className="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true" />;
+  return <div ref={containerRef} className="fixed inset-0 pointer-events-none z-0 overflow-hidden three-canvas" aria-hidden="true" />;
 }

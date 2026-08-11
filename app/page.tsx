@@ -1,12 +1,11 @@
-import { Footer } from "@/src/components/Footer";
-import { FeatureSection } from "@/src/components/FeatureSection";
 import { ArchitectureSection } from "@/src/components/ArchitectureSection";
-import { TechStackSection } from "@/src/components/TechStackSection";
+import { FeatureSection } from "@/src/components/FeatureSection";
 import { Hero } from "@/src/components/Hero";
 import { Navbar } from "@/src/components/Navbar";
+import { Portal } from "@/src/components/Motion";
 import { ScrollCanvas } from "@/src/components/ScrollCanvas";
 import { SectionTransition } from "@/src/components/SectionTransition";
-import {Portal} from "@/src/components/Motion";
+import { TechStackSection } from "@/src/components/TechStackSection";
 
 export default function Home() {
   return (
