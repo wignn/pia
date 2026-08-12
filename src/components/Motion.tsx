@@ -65,7 +65,7 @@ export function Portal() {
           tracking-wide
           uppercase
         ">
-          SLV PORTAL
+          SLV
         </h2>
 
 
@@ -84,7 +84,7 @@ export function Portal() {
 
 
         <a
-          href="https://discord.com/oauth2/authorize?client_id=1534422019561492510&permissions=8&integration_type=0&scope=bot"
+          href="https://discord.com/oauth2/authorize?client_id=1410191834241601556&permissions=8&integration_type=0&scope=bot"
           target="_blank"
           rel="noreferrer"
           style={{ backgroundColor: "#ffffff", color: "#0000ff" }}
@@ -126,7 +126,7 @@ export function Portal() {
           transition={{ duration: 1 }}
           className="
             h-full
-            max-h-[800px]
+            max-h-[600px]
             w-auto
             object-contain
             relative
@@ -140,7 +140,7 @@ export function Portal() {
       </div>
 
       {/* footer bar */}
-      <div className="
+      {/* <div className="
         relative
         z-30
         w-full
@@ -160,7 +160,7 @@ export function Portal() {
           wignn/atlsd<br/>
           MIT LICENSE · 2026
         </div>
-      </div>
+      </div> */}
 
     </section>
   );

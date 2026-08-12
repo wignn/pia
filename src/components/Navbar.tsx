@@ -17,8 +17,7 @@ export function Navbar() {
   return (
     <header className="site-nav">
       <div className="nav-left">
-        <a className="nav-wordmark" href="#top" aria-label="SLV home">SLV</a>
-        <a className="nav-link-item" href="#features">CAPABILITIES</a>
+        <a className="nav-wordmark" href="/portal" aria-label="SLV portal">PORTAL</a>
       </div>
 
       <div className="nav-center-stacked">

@@ -1,5 +1,7 @@
 "use client";
 
+import { ArchitectureCanvas } from "./ArchitectureCanvas";
+
 const components = [
   {
     num: "01",
@@ -42,6 +44,7 @@ const components = [
 export function ArchitectureSection() {
   return (
     <section className="arch-section" id="architecture">
+
       <div className="arch-container">
         <div className="arch-header">
           <p className="eyebrow"><span className="eyebrow-line" />SYSTEM TOPOLOGY</p>
