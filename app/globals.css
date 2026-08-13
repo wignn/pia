@@ -42,6 +42,7 @@ body {
 .section-transition {
   position: relative;
   will-change: opacity, transform, filter;
+  transform: translateZ(0);
 }
 
 .three-canvas canvas {
@@ -572,9 +573,11 @@ h2 {
 /* Tech Stack Section */
 .tech-section {
   padding: 100px 48px 120px;
-  background: var(--blue);
-  color: var(--cream);
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--cream);
+  background-image: radial-gradient(rgba(9,9,238,.1) 1px, transparent 1px);
+  background-size: 12px 12px;
+  color: var(--blue);
+  border-top: 1px solid rgba(9,9,238,.18);
 }
 
 .tech-container {
@@ -583,34 +586,67 @@ h2 {
 }
 
 .tech-header {
-  margin-bottom: 48px;
+  display: grid;
+  grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
+  align-items: end;
+  gap: 40px;
+  margin: 0 auto 48px;
+  max-width: 1200px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid rgba(9,9,238,.25);
+}
+
+.tech-header .eyebrow {
+  align-self: start;
+  color: rgba(9,9,238,.6);
+}
+
+.tech-header h2 {
+  color: var(--blue);
+}
+
+.tech-header h2 em {
+  color: transparent;
+  font-style: normal;
+  -webkit-text-stroke: 1px var(--blue);
 }
 
 .tech-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  max-width: 1200px;
+  margin: 0 auto;
+  border-top: 1px solid rgba(9,9,238,.2);
+  border-left: 1px solid rgba(9,9,238,.2);
 }
 
 .tech-tag {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 10px;
-  padding: 12px 20px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 2px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
+  min-height: 74px;
+  padding: 16px 18px;
+  color: var(--blue);
+  background: rgba(255,255,255,.46);
+  border-right: 1px solid rgba(9,9,238,.2);
+  border-bottom: 1px solid rgba(9,9,238,.2);
+  font: 600 10px var(--font-geist-mono), monospace;
+  letter-spacing: .08em;
   text-transform: uppercase;
+}
+
+.tech-tag:hover {
+  background: var(--blue);
+  color: var(--cream);
 }
 
 .tech-tag .dot {
   width: 6px;
   height: 6px;
+  flex: 0 0 auto;
   border-radius: 50%;
-  background: #00ff88;
+  background: currentColor;
 }
 
 /* Portal Section (Bottom Hero Footer) */
@@ -1079,6 +1115,14 @@ h2 {
   .admin-stat-grid { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 700px) {
+  .portal-section { padding-top: 100px; }
+  .portal-section .portal-content { padding-inline: 24px; }
+  .portal-section .portal-art-wrap { height: 320px; }
+  .portal-section .portal-bottom-bar { padding-inline: 24px; }
+  .tech-header { display: block; }
+  .tech-header h2 { margin-top: 32px; }
+  .tech-tags { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tech-tag { min-height: 64px; padding: 14px; font-size: 9px; }
   .portal-page { padding: 0; }
   .portal-mobile-toggle { position: fixed; top: 16px; right: 16px; z-index: 30; display: block; width: 40px; height: 40px; color: var(--cream); background: var(--blue); border: 1px solid rgba(255,255,255,.6); }
   .portal-sidebar { inset: 0 auto 0 0; width: min(86vw, 320px); transform: translateX(-105%); transition: transform .3s ease; border: 0; }
@@ -1132,3 +1176,13 @@ h2 {
 @media (prefers-reduced-motion: reduce) {
   .portal-primary-button,.portal-secondary-button,.portal-sidebar,.admin-sidebar { transition: none; }
 }
+
+/* Public architecture map — additive landing content only */
+.architecture-page { min-height: 100vh; padding: 28px 4vw 72px; color: var(--blue); background: var(--cream); background-image: radial-gradient(rgba(9,9,238,.09) 1px, transparent 1px); background-size: 12px 12px; overflow-x: hidden; }
+.architecture-page-header { display: flex; align-items: center; justify-content: space-between; max-width: 1480px; margin: 0 auto; color: var(--blue); font: 10px var(--font-geist-mono), monospace; letter-spacing: .12em; text-transform: uppercase; }
+.architecture-back { padding-bottom: 7px; border-bottom: 1px solid rgba(9,9,238,.38); }.architecture-back:hover { color: var(--blue-dark); }.architecture-header-meta { color: rgba(9,9,238,.54); }
+.architecture-intro { max-width: 1480px; margin: 12vh auto 72px; }.architecture-kicker { margin: 0 0 28px; color: rgba(9,9,238,.6); font: 10px var(--font-geist-mono), monospace; letter-spacing: .16em; }.architecture-intro h1 { max-width: 900px; margin: 0; color: var(--blue); font: 400 clamp(4.6rem, 9vw, 10rem)/.78 var(--font-display); letter-spacing: -.07em; }.architecture-intro h1 em { color: transparent; font-style: normal; -webkit-text-stroke: 1px var(--blue); }.architecture-intro > p:last-child { max-width: 520px; margin: 44px 0 0 15vw; color: #565b94; font-size: 14px; line-height: 1.65; }
+.architecture-figure { max-width: 1480px; margin: 0 auto; }.architecture-diagram-frame { overflow-x: auto; padding: 18px 0 10px; border-top: 1px solid rgba(9,9,238,.32); border-bottom: 1px solid rgba(9,9,238,.18); }.architecture-diagram { display: block; min-width: 980px; width: 100%; height: auto; overflow: visible; }.architecture-band-labels text { fill: rgba(9,9,238,.48); font: 11px var(--font-geist-mono), monospace; letter-spacing: .12em; }.architecture-diagram-node rect { fill: rgba(255,255,255,.66); stroke: rgba(9,9,238,.48); stroke-width: 1.4; }.architecture-diagram-node.is-service rect { fill: var(--blue); stroke: var(--blue); }.architecture-diagram-node.is-source rect { fill: #e9e7df; stroke: var(--blue); stroke-width: 1.6; }.architecture-diagram-node.is-client rect { fill: #e7e5dc; stroke: var(--blue); stroke-width: 1.6; }.architecture-diagram-node.is-accent rect { fill: #d7f2f2; stroke: #087e94; }.architecture-diagram-node-title,.architecture-diagram-node-detail { font-family: var(--font-geist-mono), monospace; }.architecture-diagram-node-title { fill: var(--blue); font-size: 14px; font-weight: 700; letter-spacing: .12em; }.is-service .architecture-diagram-node-title { fill: var(--cream); }.is-accent .architecture-diagram-node-title { fill: #075f70; }.architecture-diagram-node-detail { fill: #5b6097; font-size: 12px; letter-spacing: .02em; }.is-service .architecture-diagram-node-detail { fill: rgba(249,248,243,.72); }.is-accent .architecture-diagram-node-detail { fill: #397987; }.architecture-connectors path { fill: none; stroke: var(--blue); stroke-width: 1.5; vector-effect: non-scaling-stroke; }.architecture-connectors path.is-dashed { stroke-dasharray: 7 6; stroke: #087e94; }.architecture-connectors marker path { fill: var(--blue); stroke: none; }.architecture-edge-label { fill: #62679b; font: 10px var(--font-geist-mono), monospace; letter-spacing: .03em; text-anchor: middle; paint-order: stroke; stroke: var(--cream); stroke-width: 5px; stroke-linejoin: round; }.architecture-caption { display: flex; flex-wrap: wrap; gap: 22px; align-items: center; padding-top: 20px; color: #62679b; font: 10px var(--font-geist-mono), monospace; letter-spacing: .04em; }.architecture-caption span { display: inline-flex; align-items: center; gap: 8px; }.architecture-caption p { flex-basis: 100%; max-width: 700px; margin: 12px 0 0; color: #777ba4; line-height: 1.55; }.legend-line { display: inline-block; width: 27px; border-top: 2px solid var(--blue); }.legend-line.is-dashed { border-top-style: dashed; border-color: #087e94; }.legend-node { width: 10px; height: 10px; display: inline-block; border: 1px solid var(--blue); background: var(--blue); }.legend-node.is-store { background: rgba(255,255,255,.66); }
+.architecture-page-embedded { min-height: auto; margin-top: 0; padding-top: 16vh; }.architecture-page-embedded .architecture-page-header { max-width: 1280px; }
+@media (max-width: 700px) { .architecture-page { padding: 20px 18px 48px; }.architecture-page-header { align-items: flex-start; gap: 20px; }.architecture-header-meta { max-width: 150px; text-align: right; line-height: 1.5; }.architecture-intro { margin: 80px auto 48px; }.architecture-intro h1 { font-size: clamp(4rem, 17vw, 6.5rem); }.architecture-intro > p:last-child { margin-left: 0; }.architecture-diagram { min-width: 980px; }.architecture-caption { display: grid; gap: 12px; } }
+@media (prefers-reduced-motion: reduce) { .architecture-back { transition: none; } }
