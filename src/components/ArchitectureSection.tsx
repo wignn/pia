@@ -1,7 +1,5 @@
 "use client";
 
-import { ArchitectureCanvas } from "./ArchitectureCanvas";
-
 const components = [
   {
     num: "01",

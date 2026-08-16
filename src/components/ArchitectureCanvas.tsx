@@ -165,7 +165,7 @@ export function ArchitectureCanvas() {
     };
     const onVisibility = () => {
       running = document.visibilityState === "visible";
-      running ? start() : stop();
+      if (running) start(); else stop();
     };
 
     const onMotionPreferenceChange = () => {
@@ -174,7 +174,7 @@ export function ArchitectureCanvas() {
     const observer = new IntersectionObserver(
       ([entry]) => {
         visible = entry.isIntersecting;
-        visible ? start() : stop();
+        if (visible) start(); else stop();
       },
       { rootMargin: "20% 0px 20%" }
     );

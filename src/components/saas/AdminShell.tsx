@@ -42,10 +42,14 @@ function isCurrentPath(pathname: string, href: string) {
 export function AdminShell({ children, userEmail = null, isAuthorized = false }: AdminShellProps) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [prevPathname, setPrevPathname] = useState(pathname);
 
-  useEffect(() => {
+  // Close the mobile menu on navigation: reset state during render instead
+  // of inside an effect (cascading renders).
+  if (prevPathname !== pathname) {
+    setPrevPathname(pathname);
     setMobileOpen(false);
-  }, [pathname]);
+  }
 
   useEffect(() => {
     if (!mobileOpen) return;
