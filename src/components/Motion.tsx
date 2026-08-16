@@ -84,7 +84,7 @@ export function Portal() {
 
 
         <a
-          href="https://discord.com/oauth2/authorize?client_id=1410191834241601556&permissions=8&integration_type=0&scope=bot"
+          href="/portal"
           target="_blank"
           rel="noreferrer"
           style={{ backgroundColor: "#ffffff", color: "#0000ff" }}
@@ -109,7 +109,7 @@ export function Portal() {
             border-blue-600
           "
         >
-          ADD BOT TO DISCORD SERVER
+          GET STARTED
         </a>
       </div>
 

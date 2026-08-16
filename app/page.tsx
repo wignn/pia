@@ -1,3 +1,4 @@
+import { ArchitectureDiagram } from "@/src/components/ArchitectureDiagramPage";
 import { ArchitectureSection } from "@/src/components/ArchitectureSection";
 import { LenisProvider } from "@/src/components/LenisProvider";
 import { FeatureSection } from "@/src/components/FeatureSection";
@@ -20,7 +21,9 @@ export default function Home() {
       <SectionTransition><FeatureSection /></SectionTransition>
       <SectionTransition><ArchitectureSection /></SectionTransition>
       <SectionTransition><TechStackSection /></SectionTransition>
+        <ArchitectureDiagram embedded />
       <SectionTransition><Portal /></SectionTransition>
+    
     </main>
   );
 }
